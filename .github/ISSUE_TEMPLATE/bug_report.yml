@@ -1,0 +1,66 @@
+name: Ошибка прошивки или совместимости
+description: Сообщить о воспроизводимой проблеме на HAKRCF405V2
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Перед отправкой снимите пропеллеры и удалите из логов координаты, ключи и другие личные данные.
+  - type: input
+    id: board_revision
+    attributes:
+      label: Ревизия платы
+      description: Маркировка платы и основных датчиков
+      placeholder: HAKRCF405V2, STM32F405, ICM42688, ...
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Версия прошивки
+      placeholder: v4.7.0-dev-hakrcf405v2-20260927
+    validations:
+      required: true
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Способ установки
+      options:
+        - Первый HEX через STM32CubeProgrammer
+        - APJ через Mission Planner
+        - Другой способ
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Описание проблемы
+      description: Что ожидалось и что произошло фактически
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Сообщения и обезличенные логи
+      render: text
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Проверка безопасности
+      options:
+        - label: Проверка проводилась без пропеллеров
+          required: true
+        - label: Из логов удалены координаты, ключи и личные данные
+          required: true

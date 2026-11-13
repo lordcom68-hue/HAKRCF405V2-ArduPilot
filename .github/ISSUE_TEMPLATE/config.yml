@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Официальная документация ArduPilot
+    url: https://ardupilot.org/copter/
+    about: Общие вопросы по настройке ArduCopter и Mission Planner

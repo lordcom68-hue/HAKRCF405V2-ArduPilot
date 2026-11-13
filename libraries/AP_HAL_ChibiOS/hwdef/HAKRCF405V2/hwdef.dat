@@ -1,0 +1,190 @@
+# hw definition file for HACKRCF405V2 hardware
+
+
+# MCU class and specific type
+MCU STM32F4xx STM32F405xx
+
+# board ID. See Tools/AP_Bootloader/board_types.txt
+APJ_BOARD_ID AP_HW_HAKRCF405V2
+
+# crystal frequency
+OSCILLATOR_HZ 8000000
+
+define STM32_ST_USE_TIMER 4
+define CH_CFG_ST_RESOLUTION 16
+
+FLASH_SIZE_KB 1024
+
+
+# only one I2C bus
+I2C_ORDER I2C1
+
+SPI_ORDER SPI1 SPI2 SPI3
+
+# order of UARTs (and USB)
+SERIAL_ORDER OTG1 USART1 USART2 USART3 UART4 UART5 USART6
+
+# LEDs
+define AP_NOTIFY_GPIO_LED_2_ENABLED 1
+PC15 LED_BLUE OUTPUT LOW GPIO(0)
+PC14 LED_GREEN OUTPUT LOW GPIO(1)
+
+
+define HAL_GPIO_A_LED_PIN 0
+define HAL_GPIO_B_LED_PIN 1
+
+# buzzer
+PC13 BUZZER OUTPUT GPIO(80) LOW
+define HAL_BUZZER_PIN 80
+
+# GPIO
+#PC2  PINIO1 OUTPUT GPIO(81) HIGH
+PC5  PINIO2 OUTPUT GPIO(82) HIGH
+
+# spi1 bus for IMU
+PA5  SPI1_SCK  SPI1
+PA6 SPI1_MISO SPI1
+PA7 SPI1_MOSI SPI1
+
+# spi2 for OSD
+PB13 SPI2_SCK SPI2
+PB14 SPI2_MISO SPI2
+PC3  SPI2_MOSI SPI2
+PB12 FLASH1_CS  CS
+
+# spi3 for sdcard and onboard flash
+PC10 SPI3_SCK SPI3
+PC11 SPI3_MISO SPI3
+PB5 SPI3_MOSI SPI3
+PA15 MAX7456_CS CS
+# PC0 M25P16_CS CS
+
+
+
+# only one I2C bus in normal config
+PB8 I2C1_SCL I2C1
+PB9 I2C1_SDA I2C1
+
+
+# analog pins
+PC1 BATT_VOLTAGE_SENS ADC1 SCALE(1)
+PC2 BATT_CURRENT_SENS ADC1 SCALE(1)   
+# PC1 RSSI_ADC_PIN ADC1 SCALE(1)
+
+# define default battery setup
+# PC5 - ADC12_CH15
+
+# PC4 - ADC12_CH14
+define HAL_BATT_VOLT_PIN 11
+define HAL_BATT_CURR_PIN 13
+define HAL_BATT_VOLT_SCALE 11
+define HAL_BATT_CURR_SCALE 103.8
+
+#analog rssi pin (also could be used as analog airspeed input)
+# PB1 - ADC12_CH9
+define BOARD_RSSI_ANA_PIN 9
+
+# USART1
+PB6 USART1_TX USART1
+PB7 USART1_RX USART1
+
+# RC input using timer (если нужно)
+#PA3 TIM9_CH2 TIM9 RCININT PULLDOWN
+
+# alternative RC input using UART (SBUS)
+PA2 USART2_TX USART2
+PA3 USART2_RX USART2
+
+# USART3
+PB10 USART3_TX USART3
+PB11 USART3_RX USART3
+
+# UART4
+PA0 UART4_TX UART4
+PA1 UART4_RX UART4
+
+# UART5
+PD2  UART5_RX UART5
+PC12 UART5_TX UART5
+
+
+# UART6
+PC7 USART6_RX USART6
+PC6 USART6_TX USART6
+
+# PA10 IO-debug-console
+PA11 OTG_FS_DM OTG1
+PA12 OTG_FS_DP OTG1
+
+# USB detection
+#   VBUS INPUT OPENDRAIN
+
+# debug (disabled out to allow for both LEDs)
+#PA13 JTMS-SWDIO SWD
+#PA14 JTCK-SWCLK SWD
+
+# PWM out pins. Note that channel order follows the ArduPilot motor
+# order conventions
+# Motor Outputs
+
+PC8  TIM8_CH3 TIM8 PWM(1)  GPIO(50)
+PC9  TIM8_CH4 TIM8 PWM(2)  GPIO(51)
+PA8  TIM1_CH1 TIM1 PWM(3)  GPIO(52)
+PA9  TIM1_CH2 TIM1 PWM(4)  GPIO(53)
+PA10 TIM1_CH3 TIM1 PWM(5)  GPIO(54)
+PB4  TIM3_CH1 TIM3 PWM(6)  GPIO(55)
+PB0  TIM3_CH3 TIM3 PWM(7)  GPIO(56)
+PB1  TIM3_CH4 TIM3 PWM(8)  GPIO(57)
+PB3  TIM2_CH2 TIM2 PWM(9)  GPIO(58)
+
+
+
+define HAL_STORAGE_SIZE 15360
+STORAGE_FLASH_PAGE 2
+
+# reserve 32k for bootloader and 32k for flash storage
+FLASH_RESERVE_START_KB 64
+
+
+# ------------------- IMU ICM42605 ---------------------
+define HAL_INS_ICM42688_ENABLED 1
+define HAL_INS_DEFAULT 1
+SPIDEV icm42688  SPI1 DEVID0  GYRO1_CS  MODE3 1*MHZ 8*MHZ
+IMU Invensensev3 SPI:icm42688 ROTATION_ROLL_180_YAW_90
+
+PA4 GYRO1_CS CS
+
+
+# filesystem setup on sdcard
+# define HAL_OS_FATFS_IO 1
+SPIDEV dataflash SPI2 DEVID1 FLASH1_CS  MODE0 12*MHZ 12*MHZ
+# enable logging to dataflash
+define HAL_LOGGING_DATAFLASH_ENABLED 1
+
+# BARO
+# probe for I2C DPS310, but allow init on board variants without onboard baro too
+BARO DPS310 I2C:0:0x76
+# define HAL_BARO_ALLOW_INIT_NO_BARO
+# define AP_BARO_BACKEND_DEFAULT_ENABLED 0
+define AP_BARO_DPS280_ENABLED 1    
+define HAL_BARO_ALLOW_INIT_NO_BARO
+
+# no built-in compass, but probe the i2c bus for all possible
+# external compass types
+define ALLOW_ARM_NO_COMPASS
+define HAL_PROBE_EXTERNAL_I2C_COMPASSES
+define HAL_I2C_INTERNAL_MASK 0
+define HAL_COMPASS_AUTO_ROT_DEFAULT 2
+
+
+# setup for OSD
+SPIDEV osd       SPI3 DEVID2 MAX7456_CS MODE0 10*MHZ 10*MHZ
+define OSD_ENABLED 1
+define HAL_OSD_TYPE_DEFAULT 1
+ROMFS_WILDCARD libraries/AP_OSD/fonts/font0.bin
+
+# disable parachute to save flash
+define HAL_PARACHUTE_ENABLED 0
+
+# save some flash
+include ../include/minimize_fpv_osd.inc

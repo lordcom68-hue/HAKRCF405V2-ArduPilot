@@ -1,0 +1,50 @@
+name: Publication check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify HAKRCF405V2 publication files
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          required = [
+              Path("README.md"),
+              Path("COPYING.txt"),
+              Path("docs/INSTALL_RU.md"),
+              Path("docs/BUILD_RU.md"),
+              Path("docs/HARDWARE_RU.md"),
+              Path("docs/TESTING_RU.md"),
+              Path("libraries/AP_HAL_ChibiOS/hwdef/HAKRCF405V2/hwdef.dat"),
+              Path("libraries/AP_HAL_ChibiOS/hwdef/HAKRCF405V2/hwdef-bl.dat"),
+          ]
+          missing = [str(path) for path in required if not path.is_file()]
+          if missing:
+              raise SystemExit(f"Missing required files: {missing}")
+
+          hwdef = required[-2].read_text(encoding="utf-8")
+          expected = [
+              "MCU STM32F4xx STM32F405xx",
+              "APJ_BOARD_ID AP_HW_HAKRCF405V2",
+              "FLASH_SIZE_KB 1024",
+              "IMU Invensensev3 SPI:icm42688",
+          ]
+          absent = [value for value in expected if value not in hwdef]
+          if absent:
+              raise SystemExit(f"Unexpected HAKRCF405V2 hwdef: {absent}")
+
+          print("HAKRCF405V2 publication files are consistent.")
+          PY
